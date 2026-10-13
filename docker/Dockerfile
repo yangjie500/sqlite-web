@@ -44,7 +44,10 @@ RUN apk update \
       && pip install --no-cache-dir flask peewee pygments \
       && apk del .build-deps
 COPY . /src
-RUN pip install --no-cache-dir /src && rm -rf /src
+# pip is only needed during the build; remove its bundled dependencies too.
+RUN pip install --no-cache-dir /src \
+      && python -m pip uninstall --yes pip \
+      && rm -rf /src /root/.cache/pip
 EXPOSE 8080
 VOLUME /data
 WORKDIR /data
